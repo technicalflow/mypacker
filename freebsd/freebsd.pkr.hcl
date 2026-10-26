@@ -68,8 +68,7 @@ source "qemu" "freebsd-14" {
     "mdmfs -s 100m md /tmp<enter><wait>",
     "dhclient -l /tmp/dhclient.lease.vtnet0 vtnet0<enter><wait5>",
     "fetch -o /tmp/installerconfig http://{{ .HTTPIP }}:{{ .HTTPPort }}/installerconfig<enter><wait5>",
-    "bsdinstall script /tmp/installerconfig<enter><wait10>",
-    "poweroff<enter>"
+    "bsdinstall script /tmp/installerconfig<enter>"
   ]
 
   cpus      = var.cpus

@@ -3,8 +3,8 @@ export nonInteractive="YES"
 export DISTRIBUTIONS="base.txz kernel.txz"
 export BSDINSTALL_DISTDIR="/usr/freebsd-dist"
 
-# Partitioning: automatically partition the first VirtIO disk
-PARTITIONS=vtbd0
+# Partitioning: auto-partition vtbd0 without swap (all space allocated to root /)
+PARTITIONS="vtbd0 { auto freebsd-ufs / }"
 
 #!/bin/sh
 # Post-installation setup script (runs inside chroot)
@@ -23,7 +23,7 @@ echo "freebsd" | pw user mod root -h 0
 
 # Serial & video console configuration for libvirt (virsh console)
 cat << 'EOF' >> /boot/loader.conf
-autoboot_delay="2"
+autoboot_delay="1"
 boot_multicons="YES"
 boot_serial="YES"
 comconsole_speed="115200"
@@ -35,10 +35,20 @@ EOF
 # Enable serial console login on ttyu0
 sed -i '' -e 's/ttyu0.*$/ttyu0\t"\/usr\/libexec\/getty std.115200"\tvt100\tonifconsole secure/' /etc/ttys
 
-# Package installation (non-interactive if network is available)
+# Setup DNS resolution inside chroot so pkg can resolve repositories
+# GW=$(netstat -rn -f inet | awk '$1 == "default" {print $2}')
+# [ -n "$GW" ] && echo "nameserver $GW" > /etc/resolv.conf
+echo "nameserver 10.0.2.3" >> /etc/resolv.conf
+echo "nameserver 1.1.1.1" >> /etc/resolv.conf
+
+# Initialize SSL root certificate store for HTTPS fetching
+certctl rehash
+
+# Package installation (non-interactive)
 export ASSUME_ALWAYS_YES=YES
-pkg bootstrap -y || true
-pkg install -y qemu-guest-agent doas curl ca_root_nss || true
+pkg bootstrap -f -y
+pkg update
+pkg install -y qemu-guest-agent doas curl ca_root_nss
 
 if [ -f /usr/local/etc/rc.d/qemu-guest-agent ]; then
     sysrc qemu_guest_agent_enable="YES"
@@ -57,6 +67,7 @@ ln -sf /usr/share/zoneinfo/Europe/Warsaw /etc/localtime
 # Golden template cleanup: remove unique IDs, keys, logs, and entropy
 rm -f /etc/ssh/ssh_host_*
 rm -f /etc/hostid
+rm -rf /etc/resolv.conf
 rm -f /var/db/entropy*
 rm -f /var/db/dhclient.leases.*
 rm -rf /tmp/* /var/tmp/*
