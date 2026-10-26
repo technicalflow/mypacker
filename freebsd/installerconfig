@@ -48,7 +48,7 @@ certctl rehash
 export ASSUME_ALWAYS_YES=YES
 pkg bootstrap -f -y
 pkg update
-pkg install -y qemu-guest-agent doas curl ca_root_nss
+pkg install -y qemu-guest-agent doas curl python3 ca_root_nss
 
 if [ -f /usr/local/etc/rc.d/qemu-guest-agent ]; then
     sysrc qemu_guest_agent_enable="YES"
