@@ -15,8 +15,21 @@ sysrc ifconfig_DEFAULT="DHCP"
 
 # SSH daemon configuration
 sysrc sshd_enable="YES"
+
+sed -i '' \
+    -e 's/^#AllowAgentForwarding yes/AllowAgentForwarding no/' \
+    -e 's/^#AllowTcpForwarding yes/AllowTcpForwarding no/' \
+    -e 's/^#X11Forwarding yes/X11Forwarding no/' \
+    -e 's/^#Compression delayed/Compression no/' \
+    -e 's/^#LogLevel INFO/LogLevel VERBOSE/' \
+    -e 's/^#MaxAuthTries 6/MaxAuthTries 3/' \
+    /etc/ssh/sshd_config
+
+# Add root login and password authentication for initial setup
 echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
 echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config
+
+sshd -t
 
 # Set root password to 'freebsd'
 echo "freebsd" | pw user mod root -h 0
@@ -78,6 +91,20 @@ find /var/log -type f -exec truncate -s 0 {} +
 # Enable first-boot services: auto hostid generation and filesystem expansion
 sysrc hostid_enable="YES"
 sysrc growfs_enable="YES"
+# Prevent syslog from listening on UDP/TCP
+sysrc syslogd_flags="-ss"
+# Basic network hardening
+sysrc icmp_drop_redirect=YES
+sysrc tcp_drop_synfin=YES
+sysrc clear_tmp_enable=YES
+
+# Firewall
+# sysrc firewall_enable=YES
+# sysrc firewall_quiet=YES
+# sysrc firewall_type=workstation
+# sysrc firewall_myservices="ssh/tcp"
+# sysrc firewall_allowservices=any
+# sysrc firewall_logdeny=YES
 
 # Safe power off when installation finishes
 poweroff
