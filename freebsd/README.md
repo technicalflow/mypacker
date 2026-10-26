@@ -1,11 +1,11 @@
-# FreeBSD 14 Packer Template for Red Hat Libvirt Host
+# FreeBSD 14 Universal Golden Template for Red Hat Libvirt Host
 
-This template builds a compressed FreeBSD 14.0 qcow2 image suitable for deployment on Red Hat libvirt / KVM hosts.
+This template builds a generalized, clone-ready FreeBSD 14.0 qcow2 image suitable for deployment on Red Hat libvirt / KVM hosts.
 
 ## Files
 
 - `freebsd.pkr.hcl`: Packer HCL2 configuration using the QEMU builder with KVM acceleration.
-- `installerconfig`: Automated non-interactive installation configuration for FreeBSD's `bsdinstall`.
+- `installerconfig`: Automated non-interactive installation and golden image sysprep for FreeBSD's `bsdinstall`.
 
 ## Build Instructions
 
@@ -26,10 +26,15 @@ packer build \
   freebsd.pkr.hcl
 ```
 
-## Features & Configuration
+## Universal Golden Template Features
 
-- **Storage & Network**: Uses `virtio` block (`vtbd0`) and `virtio-net` (`vtnet0`) devices for native KVM performance.
-- **Console Access**: Dual console configured (`comconsole,vidconsole`) so both VNC and `virsh console` / serial console (`ttyu0` at 115200 baud) work out of the box.
-- **SSH**: `sshd` is enabled on boot with password authentication and root login enabled (default password: `freebsd`).
-- **Disk Expansion**: `growfs` is enabled to automatically grow the root filesystem on first boot if the disk is resized.
-- **Output**: Produces a compressed `freebsd14.qcow2` file in the current directory.
+- **Controller-Agnostic Storage**: `/etc/fstab` uses GEOM GPT labels (`/dev/gpt/rootfs` and `/dev/gpt/swapfs`) rather than hardcoded device names. The image can boot seamlessly on VirtIO (`vtbd`), SATA (`ada`), SCSI (`da`), or NVMe (`nda`) controllers.
+- **Safe Cloning & Unique IDs**:
+  - Existing SSH host keys are removed at the end of installation; FreeBSD automatically regenerates fresh, unique host keys on first boot.
+  - `/etc/hostid` and entropy caches are wiped; `hostid_enable="YES"` generates a unique system UUID on first boot from the new VM's SMBIOS/hardware UUID.
+  - Temporary files, shell history, and lease files are cleaned up.
+- **Dynamic Networking**: `ifconfig_DEFAULT="DHCP"` acquires DHCP on whichever interface type is assigned (VirtIO `vtnet`, Intel `em`, etc.).
+- **Guest Integration & Packages**: Installs `qemu-guest-agent`, `doas` (wheel group enabled), `curl`, and `ca_root_nss` if network access is available during the build.
+- **Automatic Disk Expansion**: `growfs_enable="YES"` automatically expands the root filesystem on first boot if a larger disk is allocated in libvirt.
+- **Dual Console Access**: Configured with `comconsole,vidconsole` at 115200 baud for both VNC/SPICE graphical console and `virsh console` serial login (`ttyu0`).
+- **Output**: Produces a compressed, sparsified `freebsd14.qcow2` ready for libvirt domains.

@@ -9,10 +9,9 @@ PARTITIONS=vtbd0
 #!/bin/sh
 # Post-installation setup script (runs inside chroot)
 
-# Network configuration
+# Network configuration: generic DHCP for any interface
 sysrc hostname="freebsd14.localdomain"
 sysrc ifconfig_DEFAULT="DHCP"
-sysrc ifconfig_vtnet0="DHCP"
 
 # SSH daemon configuration
 sysrc sshd_enable="YES"
@@ -29,16 +28,44 @@ boot_multicons="YES"
 boot_serial="YES"
 comconsole_speed="115200"
 console="comconsole,vidconsole"
+kern.geom.label.gpt.enable="1"
+kern.geom.label.ufs.enable="1"
 EOF
 
 # Enable serial console login on ttyu0
 sed -i '' -e 's/ttyu0.*$/ttyu0\t"\/usr\/libexec\/getty std.115200"\tvt100\tonifconsole secure/' /etc/ttys
 
-# Enable automatic disk expansion on first boot
-sysrc growfs_enable="YES"
+# Package installation (non-interactive if network is available)
+export ASSUME_ALWAYS_YES=YES
+pkg bootstrap -y || true
+pkg install -y qemu-guest-agent doas curl ca_root_nss || true
+
+if [ -f /usr/local/etc/rc.d/qemu-guest-agent ]; then
+    sysrc qemu_guest_agent_enable="YES"
+    sysrc qemu_guest_agent_flags="-d -v -l /var/log/qemu-ga.log"
+fi
+
+if [ -x /usr/local/bin/doas ]; then
+    echo "permit keepenv :wheel" > /usr/local/etc/doas.conf
+    chown root:wheel /usr/local/etc/doas.conf
+    chmod 0400 /usr/local/etc/doas.conf
+fi
 
 # Set timezone
 ln -sf /usr/share/zoneinfo/Europe/Warsaw /etc/localtime
+
+# Golden template cleanup: remove unique IDs, keys, logs, and entropy
+rm -f /etc/ssh/ssh_host_*
+rm -f /etc/hostid
+rm -f /var/db/entropy*
+rm -f /var/db/dhclient.leases.*
+rm -rf /tmp/* /var/tmp/*
+rm -f /root/.history /root/.bash_history
+find /var/log -type f -exec truncate -s 0 {} +
+
+# Enable first-boot services: auto hostid generation and filesystem expansion
+sysrc hostid_enable="YES"
+sysrc growfs_enable="YES"
 
 # Safe power off when installation finishes
 poweroff
