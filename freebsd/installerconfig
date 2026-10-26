@@ -52,7 +52,8 @@ pkg install -y qemu-guest-agent doas curl ca_root_nss
 
 if [ -f /usr/local/etc/rc.d/qemu-guest-agent ]; then
     sysrc qemu_guest_agent_enable="YES"
-    sysrc qemu_guest_agent_flags="-d -v -l /var/log/qemu-ga.log"
+    sysrc qemu_guest_agent_flags="-d -v -l /var/log/qemu-ga.log -m virtio-serial -p /dev/ttyV0.1"
+    # sysrc qemu_guest_agent_flags="-d -v -l /var/log/qemu-ga.log"
 fi
 
 if [ -x /usr/local/bin/doas ]; then

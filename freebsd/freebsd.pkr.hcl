@@ -23,7 +23,7 @@ variable "iso_checksum" {
 
 variable "disk_size" {
   type        = string
-  default     = "16384M"
+  default     = "32768M"
   description = "Size of the VM virtual disk"
 }
 
@@ -35,7 +35,7 @@ variable "cpus" {
 
 variable "memory" {
   type        = number
-  default     = 4096
+  default     = 2048
   description = "Amount of RAM in MB"
 }
 
