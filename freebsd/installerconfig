@@ -57,7 +57,7 @@ if [ -f /usr/local/etc/rc.d/qemu-guest-agent ]; then
 fi
 
 if [ -x /usr/local/bin/doas ]; then
-    echo "permit keepenv :wheel" > /usr/local/etc/doas.conf
+    echo "permit nopass keepenv :wheel" > /usr/local/etc/doas.conf
     chown root:wheel /usr/local/etc/doas.conf
     chmod 0400 /usr/local/etc/doas.conf
 fi
