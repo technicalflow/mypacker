@@ -1,0 +1,44 @@
+# Preamble for bsdinstall automated installation
+export nonInteractive="YES"
+export DISTRIBUTIONS="base.txz kernel.txz"
+export BSDINSTALL_DISTDIR="/usr/freebsd-dist"
+
+# Partitioning: automatically partition the first VirtIO disk
+PARTITIONS=vtbd0
+
+#!/bin/sh
+# Post-installation setup script (runs inside chroot)
+
+# Network configuration
+sysrc hostname="freebsd14.localdomain"
+sysrc ifconfig_DEFAULT="DHCP"
+sysrc ifconfig_vtnet0="DHCP"
+
+# SSH daemon configuration
+sysrc sshd_enable="YES"
+echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
+echo "PasswordAuthentication yes" >> /etc/ssh/sshd_config
+
+# Set root password to 'freebsd'
+echo "freebsd" | pw user mod root -h 0
+
+# Serial & video console configuration for libvirt (virsh console)
+cat << 'EOF' >> /boot/loader.conf
+autoboot_delay="2"
+boot_multicons="YES"
+boot_serial="YES"
+comconsole_speed="115200"
+console="comconsole,vidconsole"
+EOF
+
+# Enable serial console login on ttyu0
+sed -i '' -e 's/ttyu0.*$/ttyu0\t"\/usr\/libexec\/getty std.115200"\tvt100\tonifconsole secure/' /etc/ttys
+
+# Enable automatic disk expansion on first boot
+sysrc growfs_enable="YES"
+
+# Set timezone
+ln -sf /usr/share/zoneinfo/Europe/Warsaw /etc/localtime
+
+# Safe power off when installation finishes
+poweroff
