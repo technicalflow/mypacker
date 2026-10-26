@@ -94,8 +94,8 @@ sysrc growfs_enable="YES"
 # Prevent syslog from listening on UDP/TCP
 sysrc syslogd_flags="-ss"
 # Basic network hardening
-sysrc icmp_drop_redirect=YES
-sysrc tcp_drop_synfin=YES
+# sysrc icmp_drop_redirect=YES
+# sysrc tcp_drop_synfin=YES
 sysrc clear_tmp_enable=YES
 
 # Firewall
