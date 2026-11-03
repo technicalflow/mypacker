@@ -101,6 +101,8 @@ source "qemu" "debian-13" {
   vnc_bind_address = "0.0.0.0"
   vnc_port_min     = 5900
   vnc_port_max     = 6000
+  boot_key_interval      = "20ms"
+  boot_keygroup_interval = "20ms"
 }
 
 # ─── Build ───────────────────────────────────────────────────────────────────
@@ -117,14 +119,13 @@ build {
       "export _IMAGE=\"output-debian-13/packer-debian-13\"",
       "export IMAGEPATH=./debian13.qcow2",
       "export LIBGUESTFS_BACKEND=direct",
-#      "sudo qemu-img convert -f qcow2 -O qcow2 \"$_IMAGE\" \"$_IMAGE.convert\" && sudo rm -rf \"$_IMAGE\"",
-#      "sudo chmod a+r /boot/vmlinuz*",
       "sudo LIBGUESTFS_BACKEND=direct virt-sysprep --operations defaults,machine-id,-ssh-userdir,-customize -a \"$_IMAGE\"",
       "sudo LIBGUESTFS_BACKEND=direct virt-customize --no-network -a \"$_IMAGE\" --delete \"/var/lib/*/random-seed\" --touch \"/var/log/lastlog\" --firstboot-command \"ssh-keygen -A && systemctl reset-failed ssh.service && systemctl restart ssh.service\"",
       "sudo LIBGUESTFS_BACKEND=direct virt-sparsify --in-place \"$_IMAGE\"",
       "sudo qemu-img convert -f qcow2 -O qcow2 -c \"$_IMAGE\" \"$_IMAGE.final\"",
       "sudo mv -f \"$_IMAGE.final\" \"$IMAGEPATH\"",
-      "sudo chmod 755 \"$IMAGEPATH\""
+      "sudo chmod 755 \"$IMAGEPATH\"",
+      "sudo rm -rf $_IMAGE"
     ]
   }
 }

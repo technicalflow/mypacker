@@ -99,6 +99,8 @@ source "qemu" "centos-10" {
   vnc_bind_address = "0.0.0.0"
   vnc_port_min     = 5900
   vnc_port_max     = 6000
+  boot_key_interval      = "20ms"
+  boot_keygroup_interval = "20ms"
 }
 
 # ─── Build ───────────────────────────────────────────────────────────────────
