@@ -52,7 +52,7 @@ source "qemu" "freebsd-14" {
   qemu_binary = "qemu-system-x86_64"
   qemuargs    = [
     ["-cpu", "host"],
-    ["-machine", "q35,accel=kvm"]
+    ["-machine", "q35"]
   ]
 
   vm_name      = "packer-freebsd-14"
@@ -107,8 +107,8 @@ build {
       "export _IMAGE=\"output-freebsd-14/packer-freebsd-14\"",
       "export IMAGEPATH=./freebsd14.qcow2",
       "sudo qemu-img convert -f qcow2 -O qcow2 -c \"$_IMAGE\" \"$IMAGEPATH\"",
-      "sudo rm -rf output-freebsd-14",
-      "sudo chmod 755 \"$IMAGEPATH\""
+      "sudo chmod 755 \"$IMAGEPATH\"",
+      "sudo rm -rf \"$_IMAGE\""
     ]
   }
 }

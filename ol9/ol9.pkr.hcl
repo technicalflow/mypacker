@@ -53,7 +53,7 @@ source "qemu" "ol9" {
   qemu_binary = "qemu-system-x86_64"
   qemuargs = [
     ["-cpu", "host"],
-    ["-machine", "q35,accel=kvm"],
+    ["-machine", "q35"],
     ["-serial", "stdio"]
   ]
   efi_boot          = true

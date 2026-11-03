@@ -56,9 +56,7 @@ variable "timeout" {
 source "qemu" "debian-13" {
   accelerator = "kvm"
   qemu_binary = "qemu-system-x86_64"
-  qemuargs    = [
-    ["-cpu", "host"],
-    ["-machine", "q35,accel=kvm"]]
+  qemuargs    = [["-cpu", "host"], ["-machine", "q35"], ["-serial", "stdio"]]
 
   vm_name      = "packer-debian-13"
   iso_url      = var.iso_url
@@ -125,7 +123,7 @@ build {
       "sudo qemu-img convert -f qcow2 -O qcow2 -c \"$_IMAGE\" \"$_IMAGE.final\"",
       "sudo mv -f \"$_IMAGE.final\" \"$IMAGEPATH\"",
       "sudo chmod 755 \"$IMAGEPATH\"",
-      "sudo rm -rf $_IMAGE"
+      "sudo rm -rf \"$_IMAGE\""
     ]
   }
 }

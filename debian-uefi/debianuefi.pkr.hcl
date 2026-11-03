@@ -68,11 +68,8 @@ source "qemu" "debian13-uefi" {
   # ── UEFI firmware ──────────────────────────────────────────────────────────
   # OVMF_CODE is opened read-only; OVMF_VARS is copied to a temp file by
   # QEMU so each build starts with a clean NVRAM state.
-  qemuargs = [
-    ["-cpu", "host"],
-    ["-machine", "q35,accel=kvm"],
-    ["-global", "driver=cfi.pflash01,property=secure,value=off"],
-  ]
+  qemuargs    = [["-cpu", "host"], ["-machine", "q35"], ["-serial", "stdio"], ["-global", "driver=cfi.pflash01,property=secure,value=off"]]
+  
   efi_boot          = true
   efi_firmware_code = var.ovmf_code
   efi_firmware_vars = var.ovmf_vars
@@ -129,13 +126,14 @@ build {
     inline = [
       "set -eu",
       "export _IMAGE=\"output-debian13-uefi/packer-debian13-uefi\"",
-      "export IMAGEPATH=./debian13.qcow2",
+      "export IMAGEPATH=./debian13withuefi.qcow2",
       "export LIBGUESTFS_BACKEND=direct",
       "sudo LIBGUESTFS_BACKEND=direct virt-sysprep --operations defaults,machine-id,-ssh-userdir,-customize -a \"$_IMAGE\"",
       "sudo LIBGUESTFS_BACKEND=direct virt-customize --no-network -a \"$_IMAGE\" --delete \"/var/lib/*/random-seed\" --touch \"/var/log/lastlog\" --firstboot-command \"ssh-keygen -A && systemctl reset-failed ssh.service && systemctl restart ssh.service\"",
       "sudo LIBGUESTFS_BACKEND=direct virt-sparsify --in-place \"$_IMAGE\"",
       "sudo qemu-img convert -f qcow2 -O qcow2 -c \"$_IMAGE\" \"$_IMAGE.final\"",
-      "sudo mv -f \"$_IMAGE.final\" \"$IMAGEPATH\""
+      "sudo mv -f \"$_IMAGE.final\" \"$IMAGEPATH\"",
+      "sudo rm -rf \"$_IMAGE\""
     ]
   }
 }

@@ -56,7 +56,7 @@ variable "timeout" {
 source "qemu" "centos-10" {
   accelerator = "kvm"
   qemu_binary = "qemu-system-x86_64"
-  qemuargs    = [["-cpu", "host"], ["-machine", "q35,accel=kvm"]]
+  qemuargs    = [["-cpu", "host"], ["-machine", "q35"], ["-serial", "stdio"]]
 
   vm_name      = "packer-centos-10"
 
@@ -71,9 +71,10 @@ source "qemu" "centos-10" {
     "c<wait>",
     "set gfxpayload=keep<enter><wait>",
     "linux /images/pxeboot/vmlinuz <wait>",
-    "inst.stage2=cdrom quiet text <wait>",
+    "inst.stage2=cdrom text <wait>",
     "net.ifnames=0 biosdevname=0 systemd.unified_cgroup_hierarchy=1 <wait>",
     "inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg <wait>",
+    "console=ttyS0 inst.cmdline ",
     "---<enter><wait>",
     "initrd /images/pxeboot/initrd.img<enter><wait>",
     "boot<enter>",
@@ -120,7 +121,7 @@ build {
       "sudo LIBGUESTFS_BACKEND=direct virt-customize --no-network -a \"$_IMAGE\" --delete \"/var/lib/*/random-seed\" --firstboot-command \"/usr/local/bin/virt-sysprep-firstboot.sh\"",
       "sudo LIBGUESTFS_BACKEND=direct virt-sparsify --in-place \"$_IMAGE\"",
       "sudo qemu-img convert -f qcow2 -O qcow2 -c \"$_IMAGE\" \"$_IMAGE.final\"",
-      "sudo rm -rf \"$_IMAGE\"",
+      "sudo rm -rf \"$_IMAGE\""
     ]
   }
 }
