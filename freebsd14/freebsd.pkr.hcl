@@ -49,11 +49,9 @@ variable "timeout" {
 
 source "qemu" "freebsd-14" {
   accelerator = "kvm"
-  qemu_binary = "qemu-system-x86_64"
-  qemuargs    = [
-    ["-cpu", "host"],
-    ["-machine", "q35"]
-  ]
+  machine_type = "q35"
+  qemu_binary  = "qemu-system-x86_64"
+  qemuargs     = [["-cpu", "host"]]
 
   vm_name      = "packer-freebsd-14"
   iso_url      = var.iso_url

@@ -55,14 +55,16 @@ variable "timeout" {
 
 source "qemu" "debian-13" {
   accelerator = "kvm"
-  qemu_binary = "qemu-system-x86_64"
-  qemuargs    = [["-cpu", "host"], ["-machine", "q35"], ["-serial", "stdio"]]
+  machine_type = "q35"
+  qemu_binary  = "qemu-system-x86_64"
+  qemuargs     = [["-cpu", "host"], ["-serial", "stdio"]]
 
   vm_name      = "packer-debian-13"
   iso_url      = var.iso_url
   iso_checksum = var.iso_checksum
 
   # DVD ISO: isolinux needs ~10s to initialise before the menu appears
+  # ADD to get serial output     "console=ttyS0 inst.cmdline <wait> ",
   boot_wait = "5s"
   boot_command = [
     "<esc><esc><esc><esc><esc><esc><esc><esc><esc><esc><wait5>",

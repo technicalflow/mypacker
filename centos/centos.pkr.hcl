@@ -55,8 +55,9 @@ variable "timeout" {
 
 source "qemu" "centos-10" {
   accelerator = "kvm"
-  qemu_binary = "qemu-system-x86_64"
-  qemuargs    = [["-cpu", "host"], ["-machine", "q35"], ["-serial", "stdio"]]
+  machine_type = "q35"
+  qemu_binary  = "qemu-system-x86_64"
+  qemuargs     = [["-cpu", "host"], ["-serial", "stdio"]]
 
   vm_name      = "packer-centos-10"
 

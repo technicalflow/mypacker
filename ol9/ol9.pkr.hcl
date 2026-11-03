@@ -50,12 +50,10 @@ variable "ovmf_vars" {
 
 source "qemu" "ol9" {
   accelerator = "kvm"
-  qemu_binary = "qemu-system-x86_64"
-  qemuargs = [
-    ["-cpu", "host"],
-    ["-machine", "q35"],
-    ["-serial", "stdio"]
-  ]
+  machine_type = "q35"
+  qemu_binary  = "qemu-system-x86_64"
+  qemuargs     = [["-cpu", "host"], ["-serial", "stdio"]]
+
   efi_boot          = true
   efi_firmware_code = var.ovmf_code
   efi_firmware_vars = var.ovmf_vars

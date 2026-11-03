@@ -63,12 +63,14 @@ variable "ovmf_vars" {
 
 source "qemu" "debian13-uefi" {
   accelerator = "kvm"
-  qemu_binary = "qemu-system-x86_64"
+  machine_type = "q35"
+  qemu_binary  = "qemu-system-x86_64"
 
   # ── UEFI firmware ──────────────────────────────────────────────────────────
   # OVMF_CODE is opened read-only; OVMF_VARS is copied to a temp file by
   # QEMU so each build starts with a clean NVRAM state.
-  qemuargs    = [["-cpu", "host"], ["-machine", "q35"], ["-serial", "stdio"], ["-global", "driver=cfi.pflash01,property=secure,value=off"]]
+  # ADD ["-serial", "stdio"] for serial output
+  qemuargs    = [["-cpu", "host"], ["-global", "driver=cfi.pflash01,property=secure,value=off"]]
   
   efi_boot          = true
   efi_firmware_code = var.ovmf_code
@@ -81,8 +83,10 @@ source "qemu" "debian13-uefi" {
   # UEFI GRUB presents a graphical menu. We press 'e' to edit the first entry,
   # navigate to the end of the linux line, append kernel parameters, then
   # Ctrl-X to boot.
+  # ADD to get serial output     "console=ttyS0 inst.cmdline <wait> ",
+
   boot_wait = "5s"
-#  boot_command     = ["<wait>e<wait5>", "<down><wait><down><wait><down><wait2><end><wait5>", "<bs><bs><bs><bs><wait> autoinstall ds=\"nocloud-net;s=http://{{ .HTTPIP }}:{{ .HTTPPort }}/\" ---<wait><f10>"]
+  # boot_command     = ["<wait>e<wait5>", "<down><wait><down><wait><down><wait2><end><wait5>", "<bs><bs><bs><bs><wait> autoinstall ds=\"nocloud-net;s=http://{{ .HTTPIP }}:{{ .HTTPPort }}/\" ---<wait><f10>"]
 
   boot_command = [
     "<wait3>c<wait3>",
