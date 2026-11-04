@@ -10,12 +10,12 @@ packer {
 # ─── Variables ───────────────────────────────────────────────────────────────
 variable "iso_url" {
   type    = string
-  default = "/data/ISO/Linux/OracleLinux-R9-U8-x86_64-dvd.iso"
+  default = "/data/ISO/Linux/OracleLinux-R9-U8-x86_64-boot.iso"
 }
 
 variable "iso_checksum" {
   type    = string
-  default = "91bb95cb8e4d1ad1c496c9a87efcba3bf9d5ec976474910e9950a3fa8576428b"
+  default = "fec471a2f0324e958d18a55e8704a61cd39a49f029448699664bd4e97496dd5f"
 }
 
 variable "disk_size" {
@@ -71,7 +71,8 @@ source "qemu" "ol9" {
   boot_command = [
     "<wait5>c<wait>",
     "linux /images/pxeboot/vmlinuz ",
-    "inst.stage2=cdrom quiet text <wait> ",
+    "inst.stage2=cdrom ",
+    "inst.repo=https://yum.oracle.com/repo/OracleLinux/OL9/baseos/latest/x86_64/ text <wait> ",
     "inst.ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg <wait> ",
     "console=ttyS0 inst.cmdline ",
     "<enter><wait>",
@@ -113,11 +114,13 @@ build {
     inline = [
       "set -eu",
       "export _IMAGE=\"output-ol9/packer-ol9\"",
+      "export IMAGEPATH=./ol9withuefi.qcow2",
       "export LIBGUESTFS_BACKEND=direct",
       "sudo LIBGUESTFS_BACKEND=direct virt-sysprep --operations defaults,machine-id,-ssh-userdir,-customize -a \"$_IMAGE\"",
       "sudo LIBGUESTFS_BACKEND=direct virt-customize --no-network -a \"$_IMAGE\" --delete \"/var/lib/*/random-seed\" --firstboot-command \"/usr/local/bin/virt-sysprep-firstboot.sh\"",
       "sudo LIBGUESTFS_BACKEND=direct virt-sparsify --in-place \"$_IMAGE\"",
-      "sudo qemu-img convert -f qcow2 -O qcow2 -c \"$_IMAGE\" \"$_IMAGE.final\"",
+      "sudo qemu-img convert -f qcow2 -O qcow2 -c \"$_IMAGE\" \"$IMAGEPATH\"",
+      "sudo chmod 755 \"$IMAGEPATH\"",
       "sudo rm -rf \"$_IMAGE\"",
     ]
   }
