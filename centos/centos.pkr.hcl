@@ -117,11 +117,13 @@ build {
     inline = [
       "set -eu",
       "export _IMAGE=\"output-centos-10/packer-centos-10\"",
+      "export IMAGEPATH=./centos10.qcow2",
       "export LIBGUESTFS_BACKEND=direct",
       "sudo LIBGUESTFS_BACKEND=direct virt-sysprep --operations defaults,machine-id,-ssh-userdir,-customize -a \"$_IMAGE\"",
       "sudo LIBGUESTFS_BACKEND=direct virt-customize --no-network -a \"$_IMAGE\" --delete \"/var/lib/*/random-seed\" --firstboot-command \"/usr/local/bin/virt-sysprep-firstboot.sh\"",
       "sudo LIBGUESTFS_BACKEND=direct virt-sparsify --in-place \"$_IMAGE\"",
-      "sudo qemu-img convert -f qcow2 -O qcow2 -c \"$_IMAGE\" \"$_IMAGE.final\"",
+      "sudo qemu-img convert -f qcow2 -O qcow2 -c \"$_IMAGE\" \"$IMAGEPATH\"",
+      "sudo chmod 755 \"$IMAGEPATH\"",
       "sudo rm -rf \"$_IMAGE\""
     ]
   }

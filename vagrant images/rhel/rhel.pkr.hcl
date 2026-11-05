@@ -15,8 +15,8 @@ packer {
 
 variable "iso_url" {
   type    = string
-  # default = "/data/ISO/Linux/rhel-10.1-x86_64-dvd.iso"
-  default = "http://ia800503.us.archive.org/3/items/rhel-10.1-x86_64-resources/rhel-10.1-x86_64-dvd.iso"
+  default = "/data/ISO/Linux/rhel-10.1-x86_64-dvd.iso"
+  # default = "http://ia800503.us.archive.org/3/items/rhel-10.1-x86_64-resources/rhel-10.1-x86_64-dvd.iso"
 }
 
 variable "iso_checksum" {

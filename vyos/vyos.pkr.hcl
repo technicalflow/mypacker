@@ -123,7 +123,7 @@ source "qemu" "vyos" {
     "sudo systemctl enable qemu-guest-agent.service<enter><wait10s>",
     "sudo rm -rf /tmp/liburing2.deb /tmp/qemu-guest-agent.deb<enter><wait1s>",
 
-    "sudo sh -c 'rm -f /etc/ssh/ssh_host_* /var/lib/dhcp/*.leases /home/vyos/.bash_history /root/.bash_history'<enter><wait2s>",
+    "sudo sh -c 'rm -f /etc/ssh/ssh_host_* /var/lib/dhcp/*.lease* /home/vyos/.bash_history /root/.bash_history'<enter><wait2s>",
     "sudo truncate -s 0 /etc/machine-id<enter><wait1s>",
     "sudo journalctl --rotate<enter><wait2s>",
     "sudo journalctl --vacuum-time=1s<enter><wait3s>",
@@ -146,11 +146,11 @@ build {
       inline = [
         "set -eu",
         "export IMAGE=\"./output-vyos/packer-vyos\"",
-        "export IMAGEFINAL=/data/ISO/VMIMAGES/KVM/vyos2026.qcow2",
+        "export IMAGEFINAL=./vyos2026.qcow2",
         "sudo LIBGUESTFS_BACKEND=direct virt-sparsify --in-place \"$IMAGE\"",
         "sudo qemu-img convert -f qcow2 -O qcow2 -c \"$IMAGE\"  \"$IMAGEFINAL\"",
-        "sudo rm -rf \"$IMAGE\"",
         "sudo chmod 755 \"$IMAGEFINAL\""
+        "sudo rm -rf \"$IMAGE\"",
       ]
     }
 

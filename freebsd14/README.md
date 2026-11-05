@@ -37,4 +37,4 @@ packer build \
 - **Guest Integration & Packages**: Installs `qemu-guest-agent`, `doas` (wheel group enabled), `curl`, and `ca_root_nss` if network access is available during the build.
 - **Automatic Disk Expansion**: `growfs_enable="YES"` automatically expands the root filesystem on first boot if a larger disk is allocated in libvirt.
 - **Dual Console Access**: Configured with `comconsole,vidconsole` at 115200 baud for both VNC/SPICE graphical console and `virsh console` serial login (`ttyu0`).
-- **Output**: Produces a compressed, sparsified `freebsd14.qcow2` ready for libvirt domains.
+- **Output**: Produces a compressed and ready for libvirt domains image.
