@@ -149,7 +149,7 @@ build {
         "export IMAGEFINAL=./vyos2026.qcow2",
         "sudo LIBGUESTFS_BACKEND=direct virt-sparsify --in-place \"$IMAGE\"",
         "sudo qemu-img convert -f qcow2 -O qcow2 -c \"$IMAGE\"  \"$IMAGEFINAL\"",
-        "sudo chmod 755 \"$IMAGEFINAL\""
+        "sudo chmod 755 \"$IMAGEFINAL\"",
         "sudo rm -rf \"$IMAGE\"",
       ]
     }
