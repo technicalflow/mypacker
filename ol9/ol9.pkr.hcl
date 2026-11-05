@@ -20,7 +20,7 @@ variable "iso_checksum" {
 
 variable "disk_size" {
   type    = string
-  default = "16384M"
+  default = "32768M"
 }
 
 variable "cpus" {
