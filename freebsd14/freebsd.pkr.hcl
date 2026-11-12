@@ -11,13 +11,15 @@ packer {
 
 variable "iso_url" {
   type        = string
-  default     = "/data/ISO/Unix/FreeBSD-14.0-RELEASE-amd64-disc1.iso"
+#  default     = "/data/ISO/Unix/FreeBSD-14.0-RELEASE-amd64-disc1.iso"
+  default     = "/data/ISO/Unix/FreeBSD-14.5-RELEASE-amd64-disc1.iso"
   description = "Path or URL to FreeBSD 14 installation ISO"
 }
 
 variable "iso_checksum" {
   type        = string
-  default     = "sha256:7200214030125877561e70718781b435b703180c12575966ad1c7584a3e60dc6"
+#  default     = "sha256:7200214030125877561e70718781b435b703180c12575966ad1c7584a3e60dc6"
+  default     = "sha256:a7f360c8dbd4727a8d3213ac85f6eb9b51ee4ed2577a2c31aaebbcae3d921d56"
   description = "SHA256 checksum for the installation ISO"
 }
 
